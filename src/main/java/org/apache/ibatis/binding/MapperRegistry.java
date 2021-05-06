@@ -34,6 +34,9 @@ import java.util.Set;
 public class MapperRegistry {
 
   private final Configuration config;
+  /**
+   * 每个mapper接口与代理工厂的映射
+   */
   private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<Class<?>, MapperProxyFactory<?>>();
 
   public MapperRegistry(Configuration config) {
@@ -58,6 +61,7 @@ public class MapperRegistry {
   }
 
   public <T> void addMapper(Class<T> type) {
+    //必须是接口
     if (type.isInterface()) {
       if (hasMapper(type)) {
         throw new BindingException("Type " + type + " is already known to the MapperRegistry.");

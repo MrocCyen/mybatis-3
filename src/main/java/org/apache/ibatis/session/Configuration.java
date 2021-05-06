@@ -866,6 +866,7 @@ public class Configuration {
       this.name = name;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public V put(String key, V value) {
       if (containsKey(key)) {
@@ -882,6 +883,7 @@ public class Configuration {
       return super.put(key, value);
     }
 
+    @Override
     public V get(Object key) {
       V value = super.get(key);
       if (value == null) {
