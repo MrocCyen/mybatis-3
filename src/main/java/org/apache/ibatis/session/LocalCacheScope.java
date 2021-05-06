@@ -19,5 +19,12 @@ package org.apache.ibatis.session;
  * @author Eduardo Macarron
  */
 public enum LocalCacheScope {
-  SESSION,STATEMENT
+  /**
+   * 会话
+   */
+  SESSION,
+  /**
+   * 语句
+   */
+  STATEMENT
 }
