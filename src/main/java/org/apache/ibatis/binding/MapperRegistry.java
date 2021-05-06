@@ -35,9 +35,9 @@ public class MapperRegistry {
 
   private final Configuration config;
   /**
-   * 每个mapper接口与代理工厂的映射
+   * 每个mapper类接口与代理工厂的映射
    */
-  private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<Class<?>, MapperProxyFactory<?>>();
+  private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>();
 
   public MapperRegistry(Configuration config) {
     this.config = config;
@@ -68,6 +68,7 @@ public class MapperRegistry {
       }
       boolean loadCompleted = false;
       try {
+        //保存mapper类接口与代理工厂的映射
         knownMappers.put(type, new MapperProxyFactory<T>(type));
         // It's important that the type is added before the parser is run
         // otherwise the binding may automatically be attempted by the

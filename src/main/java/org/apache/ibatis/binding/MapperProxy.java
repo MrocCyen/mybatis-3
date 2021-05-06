@@ -35,7 +35,13 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
 
   private static final long serialVersionUID = -6424540398559729838L;
   private final SqlSession sqlSession;
+  /**
+   * mapper接口类
+   */
   private final Class<T> mapperInterface;
+  /**
+   * mapper接口类中每个方法对应一个映射方法
+   */
   private final Map<Method, MapperMethod> methodCache;
 
   public MapperProxy(SqlSession sqlSession, Class<T> mapperInterface, Map<Method, MapperMethod> methodCache) {

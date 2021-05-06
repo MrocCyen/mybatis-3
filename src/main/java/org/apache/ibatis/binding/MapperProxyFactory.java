@@ -33,7 +33,7 @@ public class MapperProxyFactory<T> {
   /**
    * mapper接口类中每个方法对应一个映射方法
    */
-  private final Map<Method, MapperMethod> methodCache = new ConcurrentHashMap<Method, MapperMethod>();
+  private final Map<Method, MapperMethod> methodCache = new ConcurrentHashMap<>();
 
   public MapperProxyFactory(Class<T> mapperInterface) {
     this.mapperInterface = mapperInterface;
