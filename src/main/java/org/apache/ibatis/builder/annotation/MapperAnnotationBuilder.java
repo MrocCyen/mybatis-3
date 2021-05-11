@@ -93,15 +93,23 @@ import org.apache.ibatis.type.UnknownTypeHandler;
  * @author Clinton Begin
  */
 public class MapperAnnotationBuilder {
-
+  /**
+   * sql注解类型
+   */
   private final Set<Class<? extends Annotation>> sqlAnnotationTypes = new HashSet<Class<? extends Annotation>>();
+  /**
+   * sql Provider注解类型
+   */
   private final Set<Class<? extends Annotation>> sqlProviderAnnotationTypes = new HashSet<Class<? extends Annotation>>();
 
   private final Configuration configuration;
+  //todo 重要
   private final MapperBuilderAssistant assistant;
+
   private final Class<?> type;
 
   public MapperAnnotationBuilder(Configuration configuration, Class<?> type) {
+    //todo ?????什么意思
     String resource = type.getName().replace('.', '/') + ".java (best guess)";
     this.assistant = new MapperBuilderAssistant(configuration, resource);
     this.configuration = configuration;
@@ -119,10 +127,15 @@ public class MapperAnnotationBuilder {
   }
 
   public void parse() {
+    //mapper接口类type信息
     String resource = type.toString();
+    //type.toString() 有没有被加载过
     if (!configuration.isResourceLoaded(resource)) {
+      //加载xml文件
       loadXmlResource();
+      //保存已经加载过此mapper接口
       configuration.addLoadedResource(resource);
+      //设置namespace
       assistant.setCurrentNamespace(type.getName());
       parseCache();
       parseCacheRef();
@@ -160,7 +173,9 @@ public class MapperAnnotationBuilder {
     // Spring may not know the real resource name so we check a flag
     // to prevent loading again a resource twice
     // this flag is set at XMLMapperBuilder#bindMapperForNamespace
+    //"namespace:" + type.getName() 有没有被加载过
     if (!configuration.isResourceLoaded("namespace:" + type.getName())) {
+      //mapper接口同名的xml文件
       String xmlResource = type.getName().replace('.', '/') + ".xml";
       InputStream inputStream = null;
       try {
@@ -168,6 +183,7 @@ public class MapperAnnotationBuilder {
       } catch (IOException e) {
         // ignore, resource is not required
       }
+      //todo 如果存在，则进行处理
       if (inputStream != null) {
         XMLMapperBuilder xmlParser = new XMLMapperBuilder(inputStream, assistant.getConfiguration(), xmlResource, configuration.getSqlFragments(), type.getName());
         xmlParser.parse();
@@ -654,4 +670,8 @@ public class MapperAnnotationBuilder {
     return answer;
   }
 
+  public static void main(String[] args) {
+    System.out.println(MapperAnnotationBuilder.class.toString());
+    System.out.println(MapperAnnotationBuilder.class.getName());
+  }
 }
