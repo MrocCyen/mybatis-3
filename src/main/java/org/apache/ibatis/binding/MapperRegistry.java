@@ -32,7 +32,9 @@ import java.util.Set;
  * @author Lasse Voss
  */
 public class MapperRegistry {
-
+  /**
+   * 全局配置
+   */
   private final Configuration config;
   /**
    * 每个mapper类接口与代理工厂的映射
@@ -109,5 +111,5 @@ public class MapperRegistry {
   public void addMappers(String packageName) {
     addMappers(packageName, Object.class);
   }
-  
+
 }
