@@ -131,19 +131,23 @@ public class MapperAnnotationBuilder {
     String resource = type.toString();
     //type.toString() 有没有被加载过
     if (!configuration.isResourceLoaded(resource)) {
-      //加载xml文件
+      //加载xml文件，加载和mapper接口同名的xml（如果存在的话），并且在同一个pkg下
       loadXmlResource();
       //保存已经加载过此mapper接口
       configuration.addLoadedResource(resource);
       //设置namespace
       assistant.setCurrentNamespace(type.getName());
+      //解析CacheNamespace
       parseCache();
+      //解析CacheNamespaceRef
       parseCacheRef();
       Method[] methods = type.getMethods();
+      //解析每个方法
       for (Method method : methods) {
         try {
           // issue #237
           if (!method.isBridge()) {
+            //解析方法
             parseStatement(method);
           }
         } catch (IncompleteElementException e) {
@@ -300,8 +304,11 @@ public class MapperAnnotationBuilder {
   }
 
   void parseStatement(Method method) {
+    //参数类型
     Class<?> parameterTypeClass = getParameterType(method);
+    //语言驱动，默认获取XMLLanguageDriver（如果没有@Lang注解的话）
     LanguageDriver languageDriver = getLanguageDriver(method);
+    //获取SqlSource
     SqlSource sqlSource = getSqlSourceFromAnnotations(method, parameterTypeClass, languageDriver);
     if (sqlSource != null) {
       Options options = method.getAnnotation(Options.class);
@@ -391,20 +398,27 @@ public class MapperAnnotationBuilder {
           options != null ? nullOrEmpty(options.resultSets()) : null);
     }
   }
-  
+
   private LanguageDriver getLanguageDriver(Method method) {
+    //默认不会设置这个驱动
     Lang lang = method.getAnnotation(Lang.class);
     Class<?> langClass = null;
     if (lang != null) {
       langClass = lang.value();
     }
+    //没有@Lang注解，传入null
     return assistant.getLanguageDriver(langClass);
   }
 
+  /**
+   * 参数类型是否有多个
+   */
   private Class<?> getParameterType(Method method) {
     Class<?> parameterType = null;
+    //每个参数类型
     Class<?>[] parameterTypes = method.getParameterTypes();
     for (Class<?> currentParameterType : parameterTypes) {
+      //参数不是RowBounds并且不是ResultHandler
       if (!RowBounds.class.isAssignableFrom(currentParameterType) && !ResultHandler.class.isAssignableFrom(currentParameterType)) {
         if (parameterType == null) {
           parameterType = currentParameterType;
@@ -468,19 +482,25 @@ public class MapperAnnotationBuilder {
     return returnType;
   }
 
+  //获取sqlSource
   private SqlSource getSqlSourceFromAnnotations(Method method, Class<?> parameterType, LanguageDriver languageDriver) {
     try {
+      //sql注解
       Class<? extends Annotation> sqlAnnotationType = getSqlAnnotationType(method);
+      //sql provider注解
       Class<? extends Annotation> sqlProviderAnnotationType = getSqlProviderAnnotationType(method);
       if (sqlAnnotationType != null) {
         if (sqlProviderAnnotationType != null) {
           throw new BindingException("You cannot supply both a static SQL and SqlProvider to method named " + method.getName());
         }
         Annotation sqlAnnotation = method.getAnnotation(sqlAnnotationType);
+        //value值
         final String[] strings = (String[]) sqlAnnotation.getClass().getMethod("value").invoke(sqlAnnotation);
+        //返回languageDriver创建的SqlSource
         return buildSqlSourceFromStrings(strings, parameterType, languageDriver);
       } else if (sqlProviderAnnotationType != null) {
         Annotation sqlProviderAnnotation = method.getAnnotation(sqlProviderAnnotationType);
+        //返回SqlSource的子类ProviderSqlSource
         return new ProviderSqlSource(assistant.getConfiguration(), sqlProviderAnnotation, type, method);
       }
       return null;
@@ -490,11 +510,14 @@ public class MapperAnnotationBuilder {
   }
 
   private SqlSource buildSqlSourceFromStrings(String[] strings, Class<?> parameterTypeClass, LanguageDriver languageDriver) {
+    //注解上的sql
     final StringBuilder sql = new StringBuilder();
     for (String fragment : strings) {
       sql.append(fragment);
       sql.append(" ");
     }
+
+    //使用语言驱动创建SqlSource，这里是通过注解的内容创建
     return languageDriver.createSqlSource(configuration, sql.toString().trim(), parameterTypeClass);
   }
 
@@ -567,7 +590,7 @@ public class MapperAnnotationBuilder {
       resultMappings.add(resultMapping);
     }
   }
-  
+
   private String nestedSelectId(Result result) {
     String nestedSelect = result.one().select();
     if (nestedSelect.length() < 1) {
@@ -588,12 +611,12 @@ public class MapperAnnotationBuilder {
     }
     return isLazy;
   }
-  
+
   private boolean hasNestedSelect(Result result) {
     if (result.one().select().length() > 0 && result.many().select().length() > 0) {
       throw new BuilderException("Cannot use both @One and @Many annotations in the same @Result");
     }
-    return result.one().select().length() > 0 || result.many().select().length() > 0;  
+    return result.one().select().length() > 0 || result.many().select().length() > 0;
   }
 
   private void applyConstructorArgs(Arg[] args, Class<?> resultType, List<ResultMapping> resultMappings) {

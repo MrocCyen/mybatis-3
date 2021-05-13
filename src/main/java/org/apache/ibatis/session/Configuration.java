@@ -204,7 +204,9 @@ public class Configuration {
     typeAliasRegistry.registerAlias("CGLIB", CglibProxyFactory.class);
     typeAliasRegistry.registerAlias("JAVASSIST", JavassistProxyFactory.class);
 
+    //设置默认语言驱动：XMLLanguageDriver
     languageRegistry.setDefaultDriverClass(XMLLanguageDriver.class);
+    //注册语言驱动：RawLanguageDriver
     languageRegistry.register(RawLanguageDriver.class);
   }
 
@@ -523,6 +525,7 @@ public class Configuration {
     return languageRegistry;
   }
 
+  //设置默认的脚本语言驱动
   public void setDefaultScriptingLanguage(Class<?> driver) {
     if (driver == null) {
       driver = XMLLanguageDriver.class;

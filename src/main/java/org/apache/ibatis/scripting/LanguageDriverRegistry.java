@@ -25,8 +25,14 @@ public class LanguageDriverRegistry {
 
   private final Map<Class<?>, LanguageDriver> LANGUAGE_DRIVER_MAP = new HashMap<Class<?>, LanguageDriver>();
 
+  /**
+   * 默认是XMLLanguageDriver，可以设置成RawLanguageDriver
+   */
   private Class<?> defaultDriverClass;
 
+  /**
+   * 最终注册后会有XMLLanguageDriver和RawLanguageDriver
+   */
   public void register(Class<?> cls) {
     if (cls == null) {
       throw new IllegalArgumentException("null is not a valid Language Driver");
