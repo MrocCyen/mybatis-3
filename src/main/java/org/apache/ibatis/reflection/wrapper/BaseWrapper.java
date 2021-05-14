@@ -29,7 +29,7 @@ public abstract class BaseWrapper implements ObjectWrapper {
 
   protected static final Object[] NO_ARGUMENTS = new Object[0];
   /**
-   * 上一次处理的MetaObject
+   * 当前处理的MetaObject
    */
   protected final MetaObject metaObject;
 
@@ -44,7 +44,7 @@ public abstract class BaseWrapper implements ObjectWrapper {
     if ("".equals(prop.getName())) {
       return object;
     } else {
-      //从上一个metaObject获取值，比如 richMap
+      //从当前metaObject获取值，比如 richMap
       return metaObject.getValue(prop.getName());
     }
   }

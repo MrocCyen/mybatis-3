@@ -18,6 +18,10 @@ package org.apache.ibatis.reflection.property;
 import java.util.Iterator;
 
 /**
+ * todo
+ * PropertyTokenizer使用迭代器模式，控制参数解析的流程
+ *
+ *
  * @author Clinton Begin
  */
 public class PropertyTokenizer implements Iterator<PropertyTokenizer> {

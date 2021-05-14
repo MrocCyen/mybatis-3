@@ -45,7 +45,9 @@ public class DynamicContext {
   public DynamicContext(Configuration configuration, Object parameterObject) {
     //parameterObject不是Map类型
     if (parameterObject != null && !(parameterObject instanceof Map)) {
+      //用MetaObject包装parameterObject，用于后续解析sql中的参数，比如 richType.richMap[key]，richType
       MetaObject metaObject = configuration.newMetaObject(parameterObject);
+      //ContextMap通过key获取数据时，先从map容器中获取，获取不到再从MetaObject中去获取
       bindings = new ContextMap(metaObject);
     } else {
       //是Map类型

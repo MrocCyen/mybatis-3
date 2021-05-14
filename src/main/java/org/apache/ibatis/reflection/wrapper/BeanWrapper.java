@@ -38,7 +38,9 @@ public class BeanWrapper extends BaseWrapper {
   private final MetaClass metaClass;
 
   public BeanWrapper(MetaObject metaObject, Object object) {
+    //传入父类，保存当前的metaObject对象，主要是后面会用到metaObject对象中的objectWrapper来获取值
     super(metaObject);
+    //当前设置值的对象
     this.object = object;
     this.metaClass = MetaClass.forClass(object.getClass(), metaObject.getReflectorFactory());
   }
