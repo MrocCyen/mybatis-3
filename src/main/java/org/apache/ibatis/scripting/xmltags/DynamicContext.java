@@ -27,6 +27,8 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 动态上下文
+ *
  * @author Clinton Begin
  */
 public class DynamicContext {
@@ -38,8 +40,17 @@ public class DynamicContext {
     OgnlRuntime.setPropertyAccessor(ContextMap.class, new ContextAccessor());
   }
 
+  /**
+   * sql中绑定的参数值
+   */
   private final ContextMap bindings;
+  /**
+   * sql
+   */
   private final StringBuilder sqlBuilder = new StringBuilder();
+  /**
+   * 唯一编号，获取一次增加一下
+   */
   private int uniqueNumber = 0;
 
   public DynamicContext(Configuration configuration, Object parameterObject) {
@@ -53,7 +64,9 @@ public class DynamicContext {
       //是Map类型
       bindings = new ContextMap(null);
     }
+    //绑定参数对象
     bindings.put(PARAMETER_OBJECT_KEY, parameterObject);
+    //绑定dbId
     bindings.put(DATABASE_ID_KEY, configuration.getDatabaseId());
   }
 
