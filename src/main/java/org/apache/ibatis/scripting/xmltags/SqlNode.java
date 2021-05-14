@@ -16,7 +16,7 @@
 package org.apache.ibatis.scripting.xmltags;
 
 /**
- * 用于处理sql语句节点
+ * 用于处理sql标签，比如if，foreach等标签
  *
  * @author Clinton Begin
  */

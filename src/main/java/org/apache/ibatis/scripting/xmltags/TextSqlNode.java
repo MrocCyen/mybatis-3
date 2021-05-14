@@ -23,6 +23,8 @@ import org.apache.ibatis.scripting.ScriptingException;
 import org.apache.ibatis.type.SimpleTypeRegistry;
 
 /**
+ * 纯文本处理
+ *
  * @author Clinton Begin
  */
 public class TextSqlNode implements SqlNode {
