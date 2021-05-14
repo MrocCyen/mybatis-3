@@ -26,19 +26,40 @@ public class PropertyTokenizer implements Iterator<PropertyTokenizer> {
   private String index;
   private final String children;
 
+  /**
+   * richField
+   * richType.richField
+   * richMap.key
+   * richMap[key]
+   * richType.richMap.key
+   * richType.richMap[key]
+   * richList[0]
+   * richType.richList[0]
+   *
+   */
   public PropertyTokenizer(String fullname) {
+    //找到第一个.号的位置
     int delim = fullname.indexOf('.');
+    //找到了
     if (delim > -1) {
+      //当前名称，比如richType.richField中的richType
       name = fullname.substring(0, delim);
+      //下一级名称，比如richType.richField中的richField
       children = fullname.substring(delim + 1);
     } else {
+      //没有.
       name = fullname;
       children = null;
     }
+    //记录上一次记录的名称
     indexedName = name;
+    //找到当前名称中的[符号的位置
     delim = name.indexOf('[');
+    //找到了
     if (delim > -1) {
+    	//找到[]中的名称，比如richMap[key]中的key
       index = name.substring(delim + 1, name.length() - 1);
+      //[之前的名称，比如richMap[key]中的richMap
       name = name.substring(0, delim);
     }
   }

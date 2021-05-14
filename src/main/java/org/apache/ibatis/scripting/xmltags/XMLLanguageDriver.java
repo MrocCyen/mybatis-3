@@ -54,6 +54,7 @@ public class XMLLanguageDriver implements LanguageDriver {
       // issue #127，一般sql
       //通过使用系统配置的属性值，来解析sql
       script = PropertyParser.parse(script, configuration.getVariables());
+      //解析文本的SqlNode
       TextSqlNode textSqlNode = new TextSqlNode(script);
       //todo 始终是动态的
       if (textSqlNode.isDynamic()) {

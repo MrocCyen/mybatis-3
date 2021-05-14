@@ -31,6 +31,9 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
  */
 public class BeanWrapper extends BaseWrapper {
 
+  /**
+   * 待设置值的对象
+   */
   private final Object object;
   private final MetaClass metaClass;
 
@@ -52,10 +55,14 @@ public class BeanWrapper extends BaseWrapper {
 
   @Override
   public void set(PropertyTokenizer prop, Object value) {
+    //有[]，比如 richMap[key]
     if (prop.getIndex() != null) {
+      //获取richMap的值
       Object collection = resolveCollection(prop, object);
+      //设置值，prop中：name=richMap，index=key
       setCollectionValue(prop, collection, value);
     } else {
+      //没有[]，比如 richField
       setBeanProperty(prop, object, value);
     }
   }
@@ -146,6 +153,7 @@ public class BeanWrapper extends BaseWrapper {
   @Override
   public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {
     MetaObject metaValue;
+    //获取richType字段类型
     Class<?> type = getSetterType(prop.getName());
     try {
       Object newObject = objectFactory.create(type);
@@ -174,7 +182,9 @@ public class BeanWrapper extends BaseWrapper {
 
   private void setBeanProperty(PropertyTokenizer prop, Object object, Object value) {
     try {
+      //根据字段名称设置值
       Invoker method = metaClass.getSetInvoker(prop.getName());
+      //待设置的值
       Object[] params = {value};
       try {
         method.invoke(object, params);

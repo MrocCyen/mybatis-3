@@ -43,10 +43,12 @@ public class DynamicContext {
   private int uniqueNumber = 0;
 
   public DynamicContext(Configuration configuration, Object parameterObject) {
+    //parameterObject不是Map类型
     if (parameterObject != null && !(parameterObject instanceof Map)) {
       MetaObject metaObject = configuration.newMetaObject(parameterObject);
       bindings = new ContextMap(metaObject);
     } else {
+      //是Map类型
       bindings = new ContextMap(null);
     }
     bindings.put(PARAMETER_OBJECT_KEY, parameterObject);
@@ -75,20 +77,28 @@ public class DynamicContext {
   }
 
   static class ContextMap extends HashMap<String, Object> {
+
     private static final long serialVersionUID = 2977601501966151582L;
 
-    private MetaObject parameterMetaObject;
+    /**
+     * 参数元数据对象，可能为空
+     */
+    private final MetaObject parameterMetaObject;
+
     public ContextMap(MetaObject parameterMetaObject) {
       this.parameterMetaObject = parameterMetaObject;
     }
 
     @Override
     public Object get(Object key) {
+      //存在这个key对应的value，直接返回
       String strKey = (String) key;
       if (super.containsKey(strKey)) {
         return super.get(strKey);
       }
 
+      //不存在
+      //从parameterMetaObject中去拿
       if (parameterMetaObject != null) {
         // issue #61 do not modify the context when reading
         return parameterMetaObject.getValue(strKey);

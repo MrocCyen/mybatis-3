@@ -32,6 +32,9 @@ import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
  */
 public class MetaObject {
 
+  /**
+   * 当前元素对象
+   */
   private final Object originalObject;
   private final ObjectWrapper objectWrapper;
   private final ObjectFactory objectFactory;
@@ -44,6 +47,7 @@ public class MetaObject {
     this.objectWrapperFactory = objectWrapperFactory;
     this.reflectorFactory = reflectorFactory;
 
+    //根据object的类型，获取不同的objectWrapper对象
     if (object instanceof ObjectWrapper) {
       this.objectWrapper = (ObjectWrapper) object;
     } else if (objectWrapperFactory.hasWrapperFor(object)) {
@@ -53,6 +57,7 @@ public class MetaObject {
     } else if (object instanceof Collection) {
       this.objectWrapper = new CollectionWrapper(this, (Collection) object);
     } else {
+      //默认bean
       this.objectWrapper = new BeanWrapper(this, object);
     }
   }
@@ -123,20 +128,41 @@ public class MetaObject {
     }
   }
 
+  /**
+   * 设置值，保存在objectWrapper中，如果有下级，保存在下级中
+   *
+   * 参考 RichType
+   *
+   * richField
+   * richType.richField
+   * richMap.key
+   * richMap[key]
+   * richType.richMap.key
+   * richType.richMap[key]
+   * richList[0]
+   * richType.richList[0]
+   */
   public void setValue(String name, Object value) {
+  	//首先进行分词，判断是否存在下级
     PropertyTokenizer prop = new PropertyTokenizer(name);
+    //是否有下级
     if (prop.hasNext()) {
+      //比如，richType.richMap[key]=value，prop为：name=richType，children=richMap[key]，indexedName=richType
+      //使用 richType 字段值，重新构建 MetaObject
       MetaObject metaValue = metaObjectForProperty(prop.getIndexedName());
       if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
+        //比如richType.richMap[key]中，richType的值没有设置，为null
         if (value == null && prop.getChildren() != null) {
           // don't instantiate child path if value is null
           return;
         } else {
+          //初始化richType的值
           metaValue = objectWrapper.instantiatePropertyValue(name, prop, objectFactory);
         }
       }
       metaValue.setValue(prop.getChildren(), value);
     } else {
+      //没有下级，比如richMap[key]=value，richField=value
       objectWrapper.set(prop, value);
     }
   }

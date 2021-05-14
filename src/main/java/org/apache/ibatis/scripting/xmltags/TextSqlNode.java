@@ -26,7 +26,13 @@ import org.apache.ibatis.type.SimpleTypeRegistry;
  * @author Clinton Begin
  */
 public class TextSqlNode implements SqlNode {
+  /**
+   * 待处理的文本，可以传入sql字符串
+   */
   private final String text;
+  /**
+   * 注入过滤器
+   */
   private final Pattern injectionFilter;
 
   public TextSqlNode(String text) {
