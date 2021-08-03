@@ -84,6 +84,7 @@ public class TransactionalCache implements Cache {
 
   @Override
   public void putObject(Object key, Object object) {
+    //先暂时存储
     entriesToAddOnCommit.put(key, object);
   }
 
@@ -102,6 +103,7 @@ public class TransactionalCache implements Cache {
     if (clearOnCommit) {
       delegate.clear();
     }
+    //todo 提交后才将数据存入到cache中
     flushPendingEntries();
     reset();
   }

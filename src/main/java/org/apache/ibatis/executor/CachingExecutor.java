@@ -35,6 +35,18 @@ import org.apache.ibatis.transaction.Transaction;
 /**
  * @author Clinton Begin
  * @author Eduardo Macarron
+ * <p>
+ * todo 重要
+ * 1、每个CachingExecutor都有一个TransactionalCacheManager
+ * 2、TransactionalCacheManager维护一个Map<Cache, TransactionalCache>
+ * 3、每个namespace的cache标签对应的Cache对象作为map的key，map的value是TransactionalCache
+ * 4、TransactionalCache装饰了namespace的cache标签对应的Cache对象，实际缓存的值是存储在namespace的cache标签对应的Cache对象中
+ * todo
+ * 总结：
+ * 在一个sqlSession中，可以访问多个语句，这些语句可能存在不同的namespace中，那么这几个语句就会对应不同的Cache标签（也就是会对应不同的Cache对象），
+ * 在访问这几个语句的时候，会通过MappedStatement取到Cache对象，将Cache对象存入TransactionalCacheManager中的Map中，假设现在有a和b两个Cache，
+ * 那么在TransactionalCacheManager中的Map中，就会存在a和b两个key，并且a和b通过TransactionalCache装饰器对象，将缓存值存储了a和b中；
+ * todo 其实之所以不同的sqlSession可以共享缓存，其实是共享MappedStatement中的Cache对象，MappedStatement中的Cache对象缓存了每个语句的值
  */
 public class CachingExecutor implements Executor {
 
@@ -55,7 +67,7 @@ public class CachingExecutor implements Executor {
   public void close(boolean forceRollback) {
     try {
       //issues #499, #524 and #573
-      if (forceRollback) { 
+      if (forceRollback) {
         tcm.rollback();
       } else {
         tcm.commit();
@@ -92,8 +104,11 @@ public class CachingExecutor implements Executor {
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
       throws SQLException {
+    //获取MappedStatement对应的cache标签设置的数据
     Cache cache = ms.getCache();
+    //todo 如果配置了<Cache>标签，cache就不会为null
     if (cache != null) {
+      //根据语句类型进行缓存清空，select语句不会清空缓存
       flushCacheIfRequired(ms);
       if (ms.isUseCache() && resultHandler == null) {
         ensureNoOutParams(ms, boundSql);
@@ -101,7 +116,8 @@ public class CachingExecutor implements Executor {
         List<E> list = (List<E>) tcm.getObject(cache, key);
         if (list == null) {
           list = delegate.<E> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
-          tcm.putObject(cache, key, list); // issue #578 and #116
+          // issue #578 and #116
+          tcm.putObject(cache, key, list);
         }
         return list;
       }
@@ -163,7 +179,8 @@ public class CachingExecutor implements Executor {
 
   private void flushCacheIfRequired(MappedStatement ms) {
     Cache cache = ms.getCache();
-    if (cache != null && ms.isFlushCacheRequired()) {      
+    //todo select一句不会清空缓存
+    if (cache != null && ms.isFlushCacheRequired()) {
       tcm.clear(cache);
     }
   }

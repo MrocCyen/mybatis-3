@@ -191,6 +191,10 @@ public abstract class BaseExecutor implements Executor {
     }
   }
 
+	/**
+	 * Statement Id + Offset + Limmit + Sql + Params
+	 * 这几个相等就代表是相同的sql
+	 */
   @Override
   public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
     if (closed) {
@@ -345,7 +349,7 @@ public abstract class BaseExecutor implements Executor {
   public void setExecutorWrapper(Executor wrapper) {
     this.wrapper = wrapper;
   }
-  
+
   private static class DeferredLoad {
 
     private final MetaObject resultObject;
