@@ -40,7 +40,7 @@ import org.apache.ibatis.transaction.Transaction;
  * 1、每个CachingExecutor都有一个TransactionalCacheManager
  * 2、TransactionalCacheManager维护一个Map<Cache, TransactionalCache>
  * 3、每个namespace的cache标签对应的Cache对象作为map的key，map的value是TransactionalCache
- * 4、TransactionalCache装饰了namespace的cache标签对应的Cache对象，实际缓存的值是存储在namespace的cache标签对应的Cache对象中
+ * 4、TransactionalCache中有个map存储的是当前的namespace中每个select语句的结果值
  * todo
  * 总结：
  * 在一个sqlSession中，可以访问多个语句，这些语句可能存在不同的namespace中，那么这几个语句就会对应不同的Cache标签（也就是会对应不同的Cache对象），
