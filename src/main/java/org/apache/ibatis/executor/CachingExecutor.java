@@ -41,12 +41,12 @@ import org.apache.ibatis.transaction.Transaction;
  * 2、TransactionalCacheManager维护一个Map<Cache, TransactionalCache>
  * 3、每个namespace的cache标签对应的Cache对象作为map的key，map的value是TransactionalCache
  * 4、TransactionalCache中有个map存储的是当前的namespace中每个select语句的结果值
- * todo
+ * todo 重要
  * 总结：
- * 在一个sqlSession中，可以访问多个语句，这些语句可能存在不同的namespace中，那么这几个语句就会对应不同的Cache标签（也就是会对应不同的Cache对象），
- * 在访问这几个语句的时候，会通过MappedStatement取到Cache对象，将Cache对象存入TransactionalCacheManager中的Map中，假设现在有a和b两个Cache，
- * 那么在TransactionalCacheManager中的Map中，就会存在a和b两个key，并且a和b通过TransactionalCache装饰器对象，将缓存值存储了a和b中；
- * todo 其实之所以不同的sqlSession可以共享缓存，其实是共享MappedStatement中的Cache对象，MappedStatement中的Cache对象缓存了每个语句的值
+ * 在不同的sqlSession中，可以访问同一个语句，得到的MappedStatement是同一个，那么就会得到相同的Cache
+ * 后执行的sqlSession就会通过cache对象得到前一个sqlSession执行得到的缓存
+ * todo 重要
+ * update语句会清空当前cache中所有语句的cache
  */
 public class CachingExecutor implements Executor {
 
